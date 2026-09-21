@@ -31,9 +31,11 @@ class Task:
     is_completed: bool = False
 
     def mark_complete(self):
+        """Mark this task as completed."""
         self.is_completed = True
 
     def is_due_on(self, target_date):
+        """Return True if this task is scheduled to occur on target_date."""
         if self.frequency == "daily":
             return True
         if self.frequency == "weekly":
@@ -49,9 +51,11 @@ class Pet:
     tasks: list = field(default_factory=list)
 
     def add_task(self, task):
+        """Add a task to this pet's task list."""
         self.tasks.append(task)
 
     def get_tasks(self):
+        """Return this pet's list of tasks."""
         return self.tasks
 
 
@@ -61,12 +65,15 @@ class Owner:
         self.pets = []
 
     def add_pet(self, pet):
+        """Add a pet to this owner's list of pets."""
         self.pets.append(pet)
 
     def get_pets(self):
+        """Return this owner's list of pets."""
         return self.pets
 
     def get_all_tasks(self):
+        """Return every task across all of this owner's pets."""
         all_tasks = []
         for pet in self.pets:
             all_tasks.extend(pet.get_tasks())
@@ -75,15 +82,18 @@ class Owner:
 
 class Scheduler:
     def get_tasks_for_today(self, owner, today=None):
+        """Return all of owner's tasks that are due on today (defaults to the real today)."""
         today = today or date_type.today()
         return [task for task in owner.get_all_tasks() if task.is_due_on(today)]
 
     def get_tasks_for_pet(self, pet, today=None):
+        """Return pet's tasks, optionally filtered to those due on today."""
         if today is None:
             return pet.get_tasks()
         return [task for task in pet.get_tasks() if task.is_due_on(today)]
 
     def build_daily_plan(self, owner, today=None):
+        """Return owner's tasks due today, sorted by priority then scheduled time."""
         todays_tasks = self.get_tasks_for_today(owner, today)
         return sorted(
             todays_tasks,
