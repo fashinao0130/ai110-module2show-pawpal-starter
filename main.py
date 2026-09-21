@@ -5,7 +5,7 @@ Creates an owner with two pets and a few tasks, then prints today's schedule.
 
 from datetime import date, timedelta
 
-from pawpal_system import Owner, Pet, Task, Scheduler
+from pawpal_system import Owner, Pet, Task, Scheduler, TaskCategory
 
 today = date.today()
 next_week = today + timedelta(days=7)
@@ -20,7 +20,7 @@ owner.add_pet(whiskers)
 
 mochi.add_task(Task(
     description="Morning walk",
-    category="walk",
+    category=TaskCategory.WALK,
     date=today,
     scheduled_time="08:00",
     duration_minutes=30,
@@ -30,7 +30,7 @@ mochi.add_task(Task(
 
 mochi.add_task(Task(
     description="Feeding",
-    category="feeding",
+    category=TaskCategory.FEEDING,
     date=today,
     scheduled_time="08:30",
     duration_minutes=10,
@@ -40,7 +40,7 @@ mochi.add_task(Task(
 
 whiskers.add_task(Task(
     description="Medication",
-    category="medication",
+    category=TaskCategory.MEDICATION,
     date=today,
     scheduled_time="09:00",
     duration_minutes=5,
@@ -51,7 +51,7 @@ whiskers.add_task(Task(
 # Not due today, included to show that filtering actually works.
 whiskers.add_task(Task(
     description="Vet appointment",
-    category="appointment",
+    category=TaskCategory.APPOINTMENT,
     date=next_week,
     scheduled_time="14:00",
     duration_minutes=60,

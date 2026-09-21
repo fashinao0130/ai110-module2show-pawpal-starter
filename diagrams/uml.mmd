@@ -18,9 +18,17 @@ classDiagram
         +get_tasks() list~Task~
     }
 
+    class TaskCategory {
+        <<enumeration>>
+        FEEDING
+        WALK
+        MEDICATION
+        APPOINTMENT
+    }
+
     class Task {
         +str description
-        +str category
+        +TaskCategory category
         +date date
         +str scheduled_time
         +int duration_minutes
@@ -39,4 +47,5 @@ classDiagram
 
     Owner "1" --> "*" Pet : owns
     Pet "1" --> "*" Task : has
+    Task --> TaskCategory : category
     Scheduler ..> Owner : organizes tasks for

@@ -5,14 +5,24 @@ Matches diagrams/uml.mmd.
 
 from dataclasses import dataclass, field
 from datetime import date as date_type
+from enum import Enum
 
 PRIORITY_ORDER = {"high": 0, "medium": 1, "low": 2}
+
+
+class TaskCategory(Enum):
+    """Fixed set of task types, so category can't drift into arbitrary free text."""
+
+    FEEDING = "feeding"
+    WALK = "walk"
+    MEDICATION = "medication"
+    APPOINTMENT = "appointment"
 
 
 @dataclass
 class Task:
     description: str
-    category: str
+    category: TaskCategory
     date: date_type
     scheduled_time: str
     duration_minutes: int
