@@ -66,5 +66,5 @@ print(f"Daily plan for {owner.name} — {today.isoformat()}")
 if not plan:
     print("  No tasks scheduled for today.")
 for task in plan:
-    pet_name = next(p.name for p in owner.get_pets() if task in p.get_tasks())
-    print(f"  {task.scheduled_time} — {task.description} ({pet_name}) [priority: {task.priority}]")
+    pet = next(p for p in owner.get_pets() if task in p.get_tasks())
+    print(f"  {task.scheduled_time} — {task.description} ({pet.name}, {pet.species}) [priority: {task.priority}]")
