@@ -18,14 +18,14 @@ whiskers = Pet("Whiskers", "cat")
 owner.add_pet(mochi)
 owner.add_pet(whiskers)
 
-mochi.add_task(Task(
-    description="Morning walk",
-    category=TaskCategory.WALK,
+whiskers.add_task(Task(
+    description="Medication",
+    category=TaskCategory.MEDICATION,
     date=today,
-    scheduled_time="08:00",
-    duration_minutes=30,
+    scheduled_time="09:00",
+    duration_minutes=5,
     priority="high",
-    frequency="daily",
+    frequency="once",
 ))
 
 mochi.add_task(Task(
@@ -38,13 +38,24 @@ mochi.add_task(Task(
     frequency="daily",
 ))
 
-whiskers.add_task(Task(
-    description="Medication",
-    category=TaskCategory.MEDICATION,
+mochi.add_task(Task(
+    description="Morning walk",
+    category=TaskCategory.WALK,
     date=today,
-    scheduled_time="09:00",
-    duration_minutes=5,
+    scheduled_time="08:00",
+    duration_minutes=30,
     priority="high",
+    frequency="daily",
+))
+
+# Same pet, same time as "Morning walk" above — included to trigger a conflict warning.
+mochi.add_task(Task(
+    description="Nail trim",
+    category=TaskCategory.APPOINTMENT,
+    date=today,
+    scheduled_time="08:00",
+    duration_minutes=15,
+    priority="medium",
     frequency="once",
 ))
 
@@ -68,3 +79,9 @@ if not plan:
 for task in plan:
     pet = next(p for p in owner.get_pets() if task in p.get_tasks())
     print(f"  {task.scheduled_time} — {task.description} ({pet.name}, {pet.species}) [priority: {task.priority}]")
+
+conflicts = scheduler.find_conflicts(owner)
+if conflicts:
+    print("\nConflicts:")
+    for warning in conflicts:
+        print(f"  {warning}")

@@ -7,17 +7,20 @@
 My initial UML design had four classes: `Owner`, `Pet`, `Task`, and `Scheduler`.
 
 - **Owner** stored the owner's name and a list of `Pet` objects, with `add_pet()` and `get_pets()` methods.
-- **Pet** was a simple data holder with just `name`, `species`, and `breed` — no behavior.
-- **Task** represented a single care activity (title, category, which pet it belonged to, scheduled time, duration, priority, whether it was recurring, and completion status), plus a `mark_complete()` method.
-- **Scheduler** held its own list of every `Task` in the system and was responsible for adding/removing tasks and answering questions like "what's due today" or "what's the plan for a pet."
 
-The reasoning behind this split was to avoid two classes both trying to own the same list of tasks: `Pet` stayed "dumb" (pure data), while `Scheduler` was the single source of truth for tasks across all pets.
+- **Pet** just holds data with `name`, `species`, and `breed`.
+
+- **Task** represented a single care activity (title, category, which pet it belonged to, scheduled time, duration, priority, whether it was recurring, and completion status) and a `mark_complete()` method.
+
+- **Scheduler** held its own list of every `Task` in the system and was responsible for adding or removing tasks and answering questions like "what's due today" or "what's the plan for a pet."
+
+The reasoning behind this split was to avoid two classes both trying to own the same list of tasks which is why `Pet` is just pure data. while `Scheduler` was the single source of truth for tasks across all pets.
 
 **b. Design changes**
 
-Yes, the design changed once I started thinking through how tasks actually connect to pets and owners. I moved task ownership from `Scheduler` to `Pet` — each `Pet` now holds its own `tasks` list directly (`add_task()`, `get_tasks()`), `Owner` gained a `get_all_tasks()` method that gathers tasks across all of its pets, and `Scheduler` became stateless: instead of storing tasks itself, it takes an `Owner` as an argument and pulls/organizes tasks on demand (`get_tasks_for_today(owner)`, `build_daily_plan(owner)`).
+Yes, the design changed once I started thinking through how tasks actually connect to pets and owners. I moved task ownership from `Scheduler` to `Pet` which means each `Pet` now holds its own `tasks` list directly (`add_task()`, `get_tasks()`), `Owner` gained a `get_all_tasks()` method that gathers tasks across all of its pets, and `Scheduler` became stateless: instead of storing tasks itself, it takes an `Owner` as an argument and pulls/organizes tasks on demand (`get_tasks_for_today(owner)`, `build_daily_plan(owner)`).
 
-I also had to add a `date` field and a `frequency` field ("once"/"daily"/"weekly") to `Task`, along with an `is_due_on()` method. Originally `Task` only tracked a time of day and completion status, but that wasn't enough to answer "is this task due today?" — a time like "08:00" doesn't say *which* day, so I needed a date to anchor one-time and weekly tasks against, and a way for daily tasks to always count as due.
+I also had to add a `date` field and a `frequency` field ("once"/"daily"/"weekly") to `Task`, along with an `is_due_on()` method. Originally `Task` only tracked a time of day and completion status, but that wasn't enough to answer "is this task due today?" For example a time like "08:00" doesn't say which day it must be done, so I needed a date for one-time and weekly tasks, and a way for daily tasks to always count as due.
 
 ---
 
