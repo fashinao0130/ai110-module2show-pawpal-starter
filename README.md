@@ -47,11 +47,10 @@ pip install -r requirements.txt
 Paste a sample of your app's CLI or Streamlit output here so a reader can see what a generated plan looks like:
 
 ```
-# e.g.:
-# Daily plan for Biscuit (Golden Retriever):
-#   08:00 — Morning walk (30 min) [priority: high]
-#   09:00 — Feeding (10 min) [priority: high]
-#   ...
+Daily plan for Daily plan for Jordan — 2026-09-20
+  08:00 — Morning walk (Mochi, dog) [priority: high]
+  08:30 — Feeding (Mochi, dog) [priority: high]
+  09:00 — Medication (Whiskers, cat) [priority: high]
 ```
 
 ## 🧪 Testing PawPal+
@@ -67,7 +66,20 @@ pytest --cov
 Sample test output:
 
 ```
-# Paste your pytest output here
+============================= test session starts ==============================
+platform darwin -- Python 3.13.9, pytest-8.4.2, pluggy-1.5.0 -- /opt/anaconda3/bin/python3
+cachedir: .pytest_cache
+rootdir: /Users/olufashina/ai110/ai110-module2show-pawpal-starter
+plugins: anyio-4.10.0, Faker-40.12.0
+collecting ... collected 5 items
+
+test/test_pawpal.py::test_mark_complete_sets_is_completed_true PASSED    [ 20%]
+test/test_pawpal.py::test_add_task_increases_pet_task_count PASSED       [ 40%]
+test/test_pawpal.py::test_sort_by_time_returns_chronological_order PASSED [ 60%]
+test/test_pawpal.py::test_mark_task_complete_creates_next_day_occurrence PASSED [ 80%]
+test/test_pawpal.py::test_find_conflicts_flags_duplicate_times PASSED    [100%]
+
+============================== 5 passed in 0.06s ===============================
 ```
 
 ## 📐 Smarter Scheduling
