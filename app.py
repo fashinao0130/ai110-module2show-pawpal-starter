@@ -117,12 +117,23 @@ if st.button("Generate schedule"):
     scheduler = Scheduler()
     plan = scheduler.build_daily_plan(owner)
 
+    for warning in scheduler.find_conflicts(owner):
+        st.warning(warning)
+
     if not plan:
         st.info("No tasks scheduled for today.")
     else:
+        st.success(f"Built a schedule with {len(plan)} task(s), sorted by priority then time.")
+        rows = []
         for task in plan:
             pet = next(p for p in owner.get_pets() if task in p.get_tasks())
-            st.write(
-                f"**{task.scheduled_time}** — {task.description} "
-                f"({pet.name}, {pet.species}) — priority: {task.priority}"
+            rows.append(
+                {
+                    "Time": task.scheduled_time,
+                    "Task": task.description,
+                    "Pet": pet.name,
+                    "Species": pet.species,
+                    "Priority": task.priority.title(),
+                }
             )
+        st.table(rows)

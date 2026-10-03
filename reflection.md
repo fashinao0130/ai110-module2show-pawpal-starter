@@ -28,13 +28,19 @@ I also had to add a `date` field and a `frequency` field ("once"/"daily"/"weekly
 
 **a. Constraints and priorities**
 
-- What constraints does your scheduler consider (for example: time, priority, preferences)?
-- How did you decide which constraints mattered most?
+
+The scheduler considers three things: time, priority used to rank tasks so urgent ones surface first, and conflicts whether two tasks for the same pet land at the same time. It does not consider owner preferences for example "no tasks before 7am" or pet-specific limits for example max tasks per day" those weren't in apart of this version.
+
+Priority was ranked above time: build_daily_plan() sorts by priority first, then by time within each priority level. The reasoning is that a pet-care app should surface urgency over chronology. Conflicts were treated as the lowest-stakes constraint: rather than blocking scheduling outright when two tasks collide, the scheduler just warns, on the assumption that a human should make the final call about overlapping care tasks rather than the program silently dropping one.
 
 **b. Tradeoffs**
 
-- Describe one tradeoff your scheduler makes.
-- Why is that tradeoff reasonable for this scenario?
+
+The Find conflicts function only catches tasks with the same schedule time string but it doesnt check if the actual time windows overlap
+
+
+This is reasonable because r≥eal overlap detection means comparing every task's start-plus-duration against the next task's start time, which adds real complexity for an edge case (near-miss overlaps) that rarely happens with a handful of daily pet-care tasks. Catching exact same-time conflicts already handles the obvious mistake so trading full accuracy for a simpler, "good enough" check is a reasonable tradeoff for a small personal planner, even though it would need to be fixed for something higher-stakes.
+
 
 ---
 
@@ -42,13 +48,11 @@ I also had to add a `date` field and a `frequency` field ("once"/"daily"/"weekly
 
 **a. How you used AI**
 
-- How did you use AI tools during this project (for example: design brainstorming, debugging, refactoring)?
-- What kinds of prompts or questions were most helpful?
+I used Claude mostly for the parts that would've taken me a long time to work through alone: brainstorming what edge cases actually mattered for sorting and recurring tasks, drafting the pytest functions for those specific behaviors, updating app.py to actually use Scheduler.find_conflicts instead of just showing the sorted list, and comparing my UML diagram against the real pawpal_system.py once I was done implementing. The prompts that worked best were the specific ones, like asking what to update in the UML "based on my final implementation" instead of just asking it to redo the diagram. That forced it to actually diff my code against the diagram instead of guessing at what my classes do.
 
 **b. Judgment and verification**
 
-- Describe one moment where you did not accept an AI suggestion as-is.
-- How did you evaluate or verify what the AI suggested?
+One place I didn't just take the output as-is was testing the Streamlit UI changes. After I asked for app.py to use st.success/st.warning/st.table, Claude told me it couldn't actually click through the app in a browser since there's no browser automation tool set up in this environment, it could only confirm the server started and that the data being fed into those components was correct. So I know I still need to open the app myself and click "Generate schedule" with two conflicting tasks before I can say that change actually works, not just trust that the code looks right.
 
 ---
 
@@ -56,13 +60,11 @@ I also had to add a `date` field and a `frequency` field ("once"/"daily"/"weekly
 
 **a. What you tested**
 
-- What behaviors did you test?
-- Why were these tests important?
+Besides the two tests I already had (marking a task complete, and a pet's task count going up after adding one), I added tests for the three Scheduler behaviors this assignment actually cares about: that sort_by_time returns tasks in chronological order, that completing a daily task creates a new task dated one day later, and that find_conflicts flags two tasks for the same pet at the same time. These mattered because they're the exact behaviors I'm claiming in the README demo walkthrough, so if they were wrong the "smarter scheduling" part of the app wouldn't actually hold up.
 
 **b. Confidence**
 
-- How confident are you that your scheduler works correctly?
-- What edge cases would you test next if you had more time?
+I'm fairly confident the common cases work since all 5 tests pass, but not confident on the edges. When I asked Claude to list edge cases for a scheduler like this, it found a few real gaps I haven't fixed or tested yet: a completed task still shows up as "due today" because is_due_on and get_tasks_for_today never check is_completed, weekly tasks only check if the weekday matches rather than whether the start date has passed yet (so a weekly task starting next month would incorrectly look due right now), and find_conflicts only flags tasks with the exact same scheduled_time string, so two overlapping-but-not-identical times (9:00 for an hour vs. 9:30) slip through even though duration_minutes exists for exactly that. If I had more time I'd write tests for those and fix them.
 
 ---
 
@@ -70,12 +72,12 @@ I also had to add a `date` field and a `frequency` field ("once"/"daily"/"weekly
 
 **a. What went well**
 
-- What part of this project are you most satisfied with?
+Probably the Scheduler itself. Once I split task ownership out to Pet and made Scheduler stateless, build_daily_plan, sort_by_time, and find_conflicts all came together pretty cleanly, and the tests back that up.
 
 **b. What you would improve**
 
-- If you had another iteration, what would you improve or redesign?
+I'd go fix the gaps from section 4, the completed-task bug and the weekly recurrence date bug especially since those are actual bugs and not just missing features, and I'd make find_conflicts compare actual time windows using duration_minutes instead of just matching the exact scheduled_time string.
 
 **c. Key takeaway**
 
-- What is one important thing you learned about designing systems or working with AI on this project?
+Design docs and diagrams drift from the real code fast once you start implementing, mine did. It's better to come back and fix the UML and README after the logic exists instead of trying to get everything perfect upfront.

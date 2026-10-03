@@ -95,12 +95,47 @@ test/test_pawpal.py::test_find_conflicts_flags_duplicate_times PASSED    [100%]
 
 ## 📸 Demo Walkthrough
 
-Describe your app in numbered steps so a reader can follow along without watching a video:
+### Main UI features
 
-1. <!-- Describe this step -->
-2. <!-- Describe this step -->
-3. <!-- Describe this step -->
-4. <!-- Describe this step -->
-5. <!-- Add more steps as needed -->
+The Streamlit app (`app.py`) lets a user:
+
+- Enter an **owner name**, persisted across reruns via `st.session_state`
+- **Add a pet** (name, species, optional breed)
+- **Add a task** for a selected pet — description, category (from the fixed `TaskCategory` enum), priority, date, time (`HH:MM`), duration, and frequency (`once`, `daily`, or `weekly`)
+- Click **Generate schedule** to build and display that owner's plan for today
+
+### Example workflow
+
+1. Enter an owner name (e.g., "Jordan") and add a pet (e.g., "Mochi", species "dog").
+2. Add a task for that pet — e.g., "Morning walk" at `08:00`, priority `high`, frequency `daily`.
+3. Add a second task at the same time (e.g., "Nail trim" at `08:00`, priority `medium`, frequency `once`) to see conflict detection in action.
+4. Click **Generate schedule**.
+5. The app shows a `st.warning` for the overlapping 08:00 tasks, a `st.success` summary of how many tasks were scheduled, and a `st.table` of the sorted plan (time, task, pet, species, priority).
+
+### Key Scheduler behaviors shown
+
+- **Filtering** — `get_tasks_for_today` only includes tasks actually due on the selected date, via each `Task.is_due_on(...)` check (so a task dated next week, like "Vet appointment" below, is correctly excluded today).
+- **Sorting** — `build_daily_plan` sorts tasks chronologically by `scheduled_time` first, then by priority (`high` → `medium` → `low`), so the busiest/most urgent tasks surface first.
+- **Conflict detection** — `find_conflicts` groups each pet's tasks by `scheduled_time` and flags any pet with two or more tasks at the same time, rather than silently double-booking them.
+- **Recurring tasks** — completing a `daily` or `weekly` task (`Pet.mark_task_complete`) automatically enqueues its next occurrence via `Task.next_occurrence()`.
+
+### Sample CLI output
+
+`main.py` seeds an owner with two pets and a deliberate same-time conflict, then prints the daily plan and any warnings:
+
+```bash
+python main.py
+```
+
+```
+Daily plan for Jordan — 2026-10-01
+  08:00 — Morning walk (Mochi, dog) [priority: high]
+  08:30 — Feeding (Mochi, dog) [priority: high]
+  09:00 — Medication (Whiskers, cat) [priority: high]
+  08:00 — Nail trim (Mochi, dog) [priority: medium]
+
+Conflicts:
+  Warning: Mochi has 2 tasks scheduled at 08:00 (Morning walk, Nail trim)
+```
 
 **Screenshot or video** *(optional)*: <!-- Insert a screenshot or link to a demo video here -->

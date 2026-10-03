@@ -16,6 +16,7 @@ classDiagram
         +list~Task~ tasks
         +add_task(task) None
         +get_tasks() list~Task~
+        +mark_task_complete(task) Task
     }
 
     class TaskCategory {
@@ -35,17 +36,22 @@ classDiagram
         +str priority
         +str frequency
         +bool is_completed
-        +mark_complete() None
+        +mark_complete() Task
+        +next_occurrence() Task
         +is_due_on(target_date) bool
     }
 
     class Scheduler {
         +get_tasks_for_today(owner, today) list~Task~
         +get_tasks_for_pet(pet, today) list~Task~
+        +sort_by_time(tasks) list~Task~
         +build_daily_plan(owner, today) list~Task~
+        +find_conflicts(owner, today) list~str~
     }
 
     Owner "1" --> "*" Pet : owns
     Pet "1" --> "*" Task : has
     Task --> TaskCategory : category
+    Pet ..> Task : mark_task_complete() calls mark_complete()
     Scheduler ..> Owner : organizes tasks for
+    Scheduler ..> Pet : groups conflicts per pet
